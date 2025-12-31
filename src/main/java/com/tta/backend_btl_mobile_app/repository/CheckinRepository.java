@@ -21,20 +21,20 @@ public interface CheckinRepository extends JpaRepository<Checkin, Long> {
     long countByUserId(@Param("userId") Long userId);
 
     @Query("SELECT COUNT(c) FROM Checkin c WHERE c.userId = :userId " +
-           "AND c.createdAt BETWEEN :startTime AND :endTime")
+        "AND c.createdAt BETWEEN :startTime AND :endTime")
     long countByUserIdAndCreatedAtBetween(
         @Param("userId") Long userId,
         @Param("startTime") LocalDateTime startTime,
         @Param("endTime") LocalDateTime endTime);
 
     @Query("SELECT c.emotion, COUNT(c) FROM Checkin c WHERE c.userId = :userId " +
-           "AND c.createdAt >= :since GROUP BY c.emotion")
+        "AND c.createdAt >= :since GROUP BY c.emotion")
     List<Object[]> countEmotionsByUserIdSince(
         @Param("userId") Long userId,
         @Param("since") LocalDateTime since);
 
     @Query(value = "SELECT * FROM checkins WHERE user_id = :userId " +
-           "ORDER BY created_at DESC LIMIT :limit", nativeQuery = true)
+        "ORDER BY created_at DESC LIMIT :limit", nativeQuery = true)
     List<Checkin> findRecentByUserId(@Param("userId") Long userId, @Param("limit") int limit);
 }
 
