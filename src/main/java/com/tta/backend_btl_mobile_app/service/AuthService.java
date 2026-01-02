@@ -23,32 +23,31 @@ public class AuthService {
     @Transactional
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
-            .orElseThrow(() -> new UnauthorizedException("Invalid username or password"));
+                .orElseThrow(() -> new UnauthorizedException("Tên đăng nhập hoặc mật khẩu không chính xác"));
 
         if (!user.getIsActive()) {
-            throw new UnauthorizedException("Account is disabled");
+            throw new UnauthorizedException("Tài khoản đã bị vô hiệu hóa");
         }
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
-            throw new UnauthorizedException("Invalid username or password");
+            throw new UnauthorizedException("Tên đăng nhập hoặc mật khẩu không chính xác");
         }
 
         // Generate JWT token
         String token = jwtTokenProvider.generateToken(user.getId(), user.getUsername(), user.getRole().name());
 
         return new AuthResponse(
-            token,
-            user.getId(),
-            user.getUsername(),
-            user.getRole().name(),
-            jwtTokenProvider.getExpirationTime()
-        );
+                token,
+                user.getId(),
+                user.getUsername(),
+                user.getRole().name(),
+                jwtTokenProvider.getExpirationTime());
     }
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new IllegalArgumentException("Username already exists");
+            throw new IllegalArgumentException("Tên đăng nhập đã tồn tại");
         }
 
         // Create user
@@ -66,11 +65,10 @@ public class AuthService {
         String token = jwtTokenProvider.generateToken(user.getId(), user.getUsername(), user.getRole().name());
 
         return new AuthResponse(
-            token,
-            user.getId(),
-            user.getUsername(),
-            user.getRole().name(),
-            jwtTokenProvider.getExpirationTime()
-        );
+                token,
+                user.getId(),
+                user.getUsername(),
+                user.getRole().name(),
+                jwtTokenProvider.getExpirationTime());
     }
 }

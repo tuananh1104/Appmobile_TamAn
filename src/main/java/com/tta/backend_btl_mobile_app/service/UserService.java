@@ -40,10 +40,10 @@ public class UserService {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startTime = now.minusDays(days);
 
-        // Lấy tổng số check-ins
-        long totalCheckIns = checkinRepository.countByUserId(userId);
+        // Lấy số check-ins TRONG KHOẢNG THỜI GIAN được filter (7/30/all days)
+        long totalCheckIns = checkinRepository.countByUserIdAndCreatedAtBetween(userId, startTime, now);
 
-        // Lấy số check-ins trong tuần này
+        // Lấy số check-ins trong tuần này (7 ngày) - dùng cho streak hoặc stats khác
         LocalDateTime weekStart = now.minusDays(7);
         long checkInsThisWeek = checkinRepository.countByUserIdAndCreatedAtBetween(userId, weekStart, now);
 
@@ -70,8 +70,7 @@ public class UserService {
                         c.getId(),
                         c.getEmotion().name(),
                         c.getCreatedAt(),
-                        c.getNote()
-                ))
+                        c.getNote()))
                 .collect(Collectors.toList());
 
         return new DashboardResponse(
@@ -81,8 +80,7 @@ public class UserService {
                 averageEmotion,
                 emotionTrends,
                 emotionDistribution,
-                recentEntryResponses
-        );
+                recentEntryResponses);
     }
 
     @Transactional
@@ -128,8 +126,7 @@ public class UserService {
                 user.getRole().name(),
                 user.getCreatedAt(),
                 user.getIsActive(),
-                user.getThemeMode().name()
-        );
+                user.getThemeMode().name());
     }
 
     private int calculateStreak(Long userId) {
@@ -214,4 +211,3 @@ public class UserService {
         };
     }
 }
-
